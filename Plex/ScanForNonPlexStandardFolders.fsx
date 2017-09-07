@@ -30,13 +30,13 @@ open System.IO
 let getSubfolders folder = Directory.EnumerateDirectories folder |> Seq.cast<string>
 
 let folderEquals (targetName: string) folder =
-  let folderName = Path.GetDirectoryName folder
+  let folderName = Path.GetFileName(folder)
   targetName.Equals(folderName, StringComparison.OrdinalIgnoreCase)
 
 let doesFolderHaveUnaccountedFolders folder = 
   let extraFolders = query {
     for f in getSubfolders folder do
-    where (not (folderEquals "Extras" f || folderEquals "Specials" f || f.IndexOf("Season") = 0))
+    where (not (folderEquals "Extras" f || folderEquals "Specials" f || Path.GetFileName(f).IndexOf("Season") <> -1))
     select f
   }
 

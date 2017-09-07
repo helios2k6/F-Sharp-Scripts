@@ -1,1 +1,5 @@
 .DS_Store
+Plex/ScanForNonPlexStandardFolders.exe
+.vscode/tasks.json
+Plex/MoveAllFoldersToExtrasFolder.exe
+Plex/output.txt
