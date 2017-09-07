@@ -51,6 +51,7 @@ let scanFolder rootFolder =
   |> Map.map verifyFolder
 
 let processFolder folder = 
+  printf "Scanning folder %s\n" folder |> ignore
   match Directory.Exists folder with
   | true -> scanFolder folder
   | false -> Map.empty
@@ -58,12 +59,14 @@ let processFolder folder =
 let printResults results =
   let printResult key value =
     match value with
-    | false -> printf "%s" key |> ignore
+    | false -> printf "%s\n" key |> ignore
     | true -> ()
 
   Map.iter printResult results
 
+[<EntryPointAttribute>]
 let main args =
+  printf "Scanning Folders\n" |> ignore
   let folder = Array.tryHead args
   match folder with
   | Some(x) -> processFolder x
