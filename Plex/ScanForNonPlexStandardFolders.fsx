@@ -27,37 +27,25 @@
 open System
 open System.IO
 
-let folderCheckPredicate targetName state (folder: string) =
-  let partialMatch = folder.IndexOf(targetName, StringComparison.OrdinalIgnoreCase)
-  match partialMatch, state with 
-  | _, true -> true
-  | -1, false -> false
-  | _, false -> true
+let getSubfolders folder = Directory.EnumerateDirectories folder |> Seq.cast<string>
 
-let doesFolderHaveFolderWithName folder name =
-  let predicate = folderCheckPredicate name
-  Directory.EnumerateDirectories folder
-  |> Seq.cast<string>
-  |> Seq.fold predicate false
-
-let doesFolderHaveExtrasFolder folder = doesFolderHaveFolderWithName folder "Extras"
-
-let doesFolderHaveSpecialsFolder folder = doesFolderHaveFolderWithName folder "Specials"
-
-let doesFolderHaveSeasonFolders folder = doesFolderHaveFolderWithName folder "Season"
+let folderEquals (targetName: string) folder =
+  let folderName = Path.GetDirectoryName folder
+  targetName.Equals(folderName, StringComparison.OrdinalIgnoreCase)
 
 let doesFolderHaveUnaccountedFolders folder = 
-  Directory.EnumerateDirectories folder
-  |> Seq.cast<string>
+  let extraFolders = query {
+    for f in getSubfolders folder do
+    where (not (folderEquals "Extras" f || folderEquals "Specials" f || f.IndexOf("Season") = 0))
+    select f
+  }
 
+  not <| Seq.isEmpty extraFolders
 
-
-let verifyFolder folder _ =
-  false
+let verifyFolder folder _ = doesFolderHaveUnaccountedFolders folder
 
 let scanFolder rootFolder =
-  Directory.EnumerateDirectories rootFolder
-  |> Seq.cast<string>
+  getSubfolders rootFolder
   |> Seq.map (fun f -> (f, false))
   |> Map.ofSeq
   |> Map.map verifyFolder
