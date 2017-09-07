@@ -42,7 +42,7 @@ let doesFolderHaveUnaccountedFolders folder =
 
   not <| Seq.isEmpty extraFolders
 
-let verifyFolder folder _ = doesFolderHaveUnaccountedFolders folder
+let verifyFolder folder _ = not <| doesFolderHaveUnaccountedFolders folder
 
 let scanFolder rootFolder =
   getSubfolders rootFolder
@@ -56,7 +56,12 @@ let processFolder folder =
   | false -> Map.empty
 
 let printResults results =
-  None
+  let printResult key value =
+    match value with
+    | false -> printf "%s" key |> ignore
+    | true -> ()
+
+  Map.iter printResult results
 
 let main args =
   let folder = Array.tryHead args
