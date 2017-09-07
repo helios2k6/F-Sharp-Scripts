@@ -27,21 +27,30 @@
 open System
 open System.IO
 
-let doesFolderHaveFolderWithName folder name =
-  let predicate = fun state (element: string) -> 
-    let partialMatch = element.IndexOf(name, StringComparison.OrdinalIgnoreCase)
-    match partialMatch, state with 
-    | _, true -> true
-    | -1, false -> false
-    | _, false -> true
+let folderCheckPredicate targetName state (folder: string) =
+  let partialMatch = folder.IndexOf(targetName, StringComparison.OrdinalIgnoreCase)
+  match partialMatch, state with 
+  | _, true -> true
+  | -1, false -> false
+  | _, false -> true
 
+let doesFolderHaveFolderWithName folder name =
+  let predicate = folderCheckPredicate name
   Directory.EnumerateDirectories folder
   |> Seq.cast<string>
   |> Seq.fold predicate false
 
-let doesFolderHaveSpecialsFolder folder = doesFolderHaveFolderWithName "Specials"
+let doesFolderHaveExtrasFolder folder = doesFolderHaveFolderWithName folder "Extras"
 
-let doesFolderHaveSeasonFolders folder = doesFolderHaveFolderWithName "Season"
+let doesFolderHaveSpecialsFolder folder = doesFolderHaveFolderWithName folder "Specials"
+
+let doesFolderHaveSeasonFolders folder = doesFolderHaveFolderWithName folder "Season"
+
+let doesFolderHaveUnaccountedFolders folder = 
+  Directory.EnumerateDirectories folder
+  |> Seq.cast<string>
+
+
 
 let verifyFolder folder _ =
   false
